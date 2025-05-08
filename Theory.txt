@@ -1,0 +1,549 @@
+Dataset & Libraries
+python
+Copy
+Edit
+import tensorflow as tf
+import numpy as np
+from tensorflow.keras import layers, models
+from sklearn.datasets import fetch_california_housing
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.preprocessing import StandardScaler
+import matplotlib.pyplot as plt
+import pandas as pd
+import seaborn as sns
+These lines import all necessary libraries for:
+
+Deep learning (tensorflow)
+
+Data handling (pandas, numpy)
+
+Plotting (matplotlib, seaborn)
+
+Data preprocessing and metrics (sklearn)
+
+📊 Reading and Exploring the Dataset
+python
+Copy
+Edit
+df = pd.read_csv("BostonHousing.csv")
+Loads the Boston Housing dataset from a CSV file.
+
+python
+Copy
+Edit
+df.columns
+df.sample(5)
+df.info()
+df.isnull().sum()
+df.shape
+Checks column names, shows 5 random rows, checks for missing data, and prints dataset shape.
+
+python
+Copy
+Edit
+df.fillna(df.mean(), inplace=True)
+df.isnull().sum()
+df.shape
+Fills missing values (if any) with the average of each column.
+
+🔥 Data Visualization
+python
+Copy
+Edit
+sns.heatmap(df.corr(), annot=True, square=True)
+Draws a heatmap to visualize correlation between features.
+
+📌 Preparing Features and Labels
+python
+Copy
+Edit
+X = df.drop(['MEDV'], axis=1)
+y = df['MEDV']
+X: all columns except MEDV (target/price).
+
+y: target values (Median value of owner-occupied homes).
+
+python
+Copy
+Edit
+x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=10)
+Splits data: 70% for training, 30% for testing.
+
+⚙️ Data Scaling
+python
+Copy
+Edit
+scaler = StandardScaler()
+x_train = scaler.fit_transform(x_train)
+x_test = scaler.transform(x_test)
+Standardizes input data (mean = 0, std = 1), which helps the model learn faster.
+
+🧠 Creating the Neural Network
+python
+Copy
+Edit
+from keras.models import Sequential
+from keras.layers import Dense
+
+model = Sequential([
+    Dense(128, activation='relu', input_shape=(13,)),
+    Dense(64, activation='relu'),
+    Dense(32, activation='relu'),
+    Dense(16, activation='relu'),
+    Dense(1)
+])
+Builds a deep neural network with:
+
+4 hidden layers using ReLU activation
+
+1 output layer (for predicting the price)
+
+python
+Copy
+Edit
+model.compile(optimizer='adam', loss='mse', metrics=['mae'])
+Optimizer: adam (efficient gradient descent)
+
+Loss: Mean Squared Error (MSE)
+
+Metric: Mean Absolute Error (MAE)
+
+python
+Copy
+Edit
+model.summary()
+Prints the model architecture and number of parameters.
+
+🚀 Training the Model
+python
+Copy
+Edit
+model.fit(x_train, y_train, epochs=150, batch_size=32, validation_split=0.03)
+Trains the model for 150 rounds (epochs), using small groups of 32 samples (batch size).
+
+3% of training data is used for validation.
+
+🧪 Evaluating the Model
+python
+Copy
+Edit
+loss, mae = model.evaluate(x_test, y_test, verbose=0)
+print(f"Mean Squared Error", loss)
+print(f"Mean Absolute Error", mae)
+Evaluates the model using the test set.
+
+Prints MSE and MAE.
+
+📈 Model Prediction and Visualization
+python
+Copy
+Edit
+predictions = model.predict(x_test)
+Predicts prices for the test set.
+
+python
+Copy
+Edit
+rmse = np.sqrt(mean_squared_error(y_test, predictions))
+print(f"RMSE: ", rmse)
+
+r2 = r2_score(y_test, predictions)
+print(f"R2 Score : ", r2)
+Calculates RMSE and R² Score to see how well the model performs.
+
+python
+Copy
+Edit
+plt.figure(figsize=(10, 6))
+plt.scatter(y_test, predictions, alpha=0.5, edgecolors='k')
+plt.plot([min(y_test), max(y_test)], [min(y_test), max(y_test)], color="red", linestyle="dashed")
+plt.xlabel("True Prices")
+plt.ylabel("Predicted Prices")
+plt.title("True Prices vs Predicted Prices")
+plt.show()
+Draws a scatter plot comparing true vs predicted values. A red dashed line shows perfect prediction.
+
+🔍 Predicting for a Single Input
+python
+Copy
+Edit
+predicted_value = model.predict(x_test[0].reshape(1, -1))
+print(f"Prediction for first test sample: {predicted_value}")
+Predicts the price of the first house in the test set.
+
+Would you like me to generate a simplified diagram showing how this neural network works step by step? 
+
+
+
+
+
+
+
+
+You said:
+i have used various libraries here so give me pip command to install each of them
+
+
+ChatGPT said:
+Sure! Here's the list of all the libraries used in your notebook and the corresponding pip commands to install them:
+
+✅ Pip Installation Commands
+bash
+Copy
+Edit
+pip install tensorflow
+pip install numpy
+pip install pandas
+pip install matplotlib
+pip install seaborn
+pip install scikit-learn
+📝 Breakdown:
+Library	Purpose
+tensorflow	Building and training deep learning models
+numpy	Numerical operations on arrays
+pandas	Data handling and manipulation
+matplotlib	Plotting and visualization
+seaborn	Statistical plotting (heatmaps, etc.)
+scikit-learn	Data preprocessing, splitting, metrics
+
+Let me know if you'd like a requirements.txt file as well.
+
+
+
+
+
+
+
+You said:
+Ass2_DL_DNN_IMDB.ipynb
+File
+"Explain above code line by line in as simple words as possible"
+
+
+ChatGPT said:
+Thanks for your patience! Here's a line-by-line explanation in simple words of the code in your Ass2_DL_DNN_IMDB.ipynb file. The notebook builds a Deep Neural Network for sentiment analysis using the IMDB movie review dataset.
+
+📦 1. Import Libraries and Dataset
+python
+Copy
+Edit
+from tensorflow.keras.datasets import imdb
+import numpy as np
+Loads the IMDB dataset which has movie reviews labeled as positive or negative.
+
+numpy helps with numerical tasks.
+
+📊 2. Set Parameters and Load Data
+python
+Copy
+Edit
+max_words = 10000
+max_sequence_length = 900
+
+(x_train, y_train), (x_test, y_test) = imdb.load_data(num_words=max_words)
+Only keep the 10,000 most common words.
+
+Limit each review to 900 words.
+
+x_train, y_train: training data and labels (0 = negative, 1 = positive)
+
+x_test, y_test: testing data and labels
+
+🧼 3. Preprocess the Text Data
+python
+Copy
+Edit
+from tensorflow import keras
+
+x_train = keras.preprocessing.sequence.pad_sequences(x_train, maxlen=max_sequence_length)
+x_test = keras.preprocessing.sequence.pad_sequences(x_test, maxlen=max_sequence_length)
+Reviews are of different lengths.
+
+This step pads shorter reviews with 0s or trims longer ones to exactly 900 words.
+
+🧠 4. Build the Deep Neural Network
+python
+Copy
+Edit
+from tensorflow.keras import layers
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Dropout, Embedding, GlobalMaxPooling1D
+
+model = Sequential()
+Using Keras Sequential API to build a model layer by layer.
+
+python
+Copy
+Edit
+model.add(Embedding(max_words, 100, input_length=max_sequence_length))
+Embedding turns word IDs into 100-dim vectors.
+
+It helps the model understand word meaning and relationships.
+
+python
+Copy
+Edit
+model.add(GlobalMaxPooling1D())
+Reduces the entire sequence of vectors to a single max value per feature, keeping important info.
+
+python
+Copy
+Edit
+model.add(Dense(32, activation='relu'))
+model.add(Dense(16, activation='relu'))
+model.add(Dense(1, activation='sigmoid'))
+Adds fully connected layers:
+
+Two hidden layers (32 and 16 units)
+
+ReLU is the activation (works well in deep nets)
+
+Final output uses sigmoid → gives a value between 0 and 1 (probability of being positive)
+
+⚙️ 5. Compile the Model
+python
+Copy
+Edit
+model.compile(loss='binary_crossentropy', optimizer='rmsprop', metrics=['accuracy'])
+binary_crossentropy: best for yes/no classification
+
+rmsprop: a popular optimizer
+
+Track accuracy during training
+
+🚀 6. Train the Model
+python
+Copy
+Edit
+history = model.fit(x_train, y_train, batch_size=512, epochs=10, validation_data=(x_test, y_test))
+Trains for 10 rounds (epochs) using 512 samples at a time.
+
+Also evaluates on test data after each epoch.
+
+📈 7. Plot Accuracy and Loss
+python
+Copy
+Edit
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=(12, 5))
+Sets up a wide figure for side-by-side plots.
+
+Accuracy Plot
+python
+Copy
+Edit
+plt.subplot(1, 2, 1)
+plt.plot(history.history['accuracy'], label='Train Acc', color='blue')
+plt.plot(history.history['val_accuracy'], label='Val Acc', color='green')
+Plots training and validation accuracy over time.
+
+Loss Plot
+python
+Copy
+Edit
+plt.subplot(1, 2, 2)
+plt.plot(history.history['loss'], label='Train Loss', color='red')
+plt.plot(history.history['val_loss'], label='Val Loss', color='orange')
+Shows how the error (loss) changes during training.
+
+python
+Copy
+Edit
+plt.tight_layout()
+plt.show()
+Displays both plots neatly.
+
+📊 8. Evaluate on Test Data
+python
+Copy
+Edit
+loss, accuracy = model.evaluate(x_test, y_test)
+print("Test Loss:", loss)
+print("Test Accuracy:", accuracy)
+Tests the model on unseen data and prints the result.
+
+The last line (y_pred_probs = m) seems incomplete, possibly a mistake or the next code cell was not included.
+
+Would you like me to complete the last part (predicting sentiment for new input), or help you enhance the model? 
+
+
+
+
+
+
+ Importing Libraries
+python
+Copy
+Edit
+import matplotlib.pyplot as plt
+import numpy as np
+from tensorflow.keras.datasets import fashion_mnist
+matplotlib.pyplot: Used to draw graphs and show images.
+
+numpy: Used for numerical operations, especially with arrays.
+
+fashion_mnist: A built-in dataset from Keras with 28x28 grayscale images of fashion items (like shirts, shoes, etc.).
+
+2. Loading the Dataset
+python
+Copy
+Edit
+(train_x, train_y), (test_x, test_y) = fashion_mnist.load_data()
+Loads the Fashion MNIST data into training and test sets.
+
+train_x: Images for training.
+
+train_y: Labels (what item each image shows).
+
+test_x, test_y: Same but for testing the model.
+
+3. Normalizing the Data
+python
+Copy
+Edit
+train_x = train_x / 255.0
+test_x = test_x / 255.0
+Image pixel values are between 0 and 255.
+
+Dividing by 255 changes them to 0–1 range, which helps the model learn better.
+
+4. Importing Model and Layers
+python
+Copy
+Edit
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Flatten, MaxPooling2D, Conv2D, BatchNormalization, Dropout
+Sequential: Lets us build the model layer by layer.
+
+Dense: A fully connected layer.
+
+Flatten: Turns 2D images into 1D vectors for the Dense layer.
+
+MaxPooling2D: Reduces image size while keeping important features.
+
+Conv2D: A convolutional layer for detecting patterns like edges or textures.
+
+BatchNormalization: Speeds up and stabilizes training.
+
+Dropout: Prevents overfitting by randomly turning off some neurons during training.
+
+5. Expanding Image Dimensions
+python
+Copy
+Edit
+train_x = np.expand_dims(train_x, axis=-1)
+test_x = np.expand_dims(test_x, axis=-1)
+Adds a "channel" dimension to the image (28x28 becomes 28x28x1).
+
+Required because convolutional layers expect this format.
+
+Would you like me to continue explaining the next set of lines? 
+
+
+
+
+
+
+
+
+You said:
+Google_practise2.ipynb
+File
+"Explain above code line by line in as simple words as possible"
+
+
+ChatGPT said:
+Here's a simple, line-by-line explanation of the first few blocks of code in your second notebook:
+
+1. Importing Libraries
+python
+Copy
+Edit
+import pandas as pd 
+import numpy as np
+import matplotlib.pyplot as plt 
+from keras.models import Sequential
+from keras.layers import Dense, SimpleRNN
+from sklearn.model_selection import train_test_split 
+from sklearn.preprocessing import MinMaxScaler
+pandas: Helps work with tabular data (like Excel files).
+
+numpy: Handles numbers and arrays.
+
+matplotlib.pyplot: Used to draw graphs.
+
+Sequential: Used to build a machine learning model step-by-step.
+
+Dense: A fully connected layer in the model.
+
+SimpleRNN: A type of neural network for sequential data (like time series).
+
+train_test_split: Splits your data into training and testing sets.
+
+MinMaxScaler: Normalizes data values to be between 0 and 1.
+
+2. Loading the CSV File
+python
+Copy
+Edit
+df = pd.read_csv('GOOGL.csv')
+Loads stock data for Google from a CSV file named "GOOGL.csv" into a DataFrame called df.
+
+3. Viewing the First Few Rows
+python
+Copy
+Edit
+df.head()
+Shows the first 5 rows of the dataset to understand what kind of data you're working with.
+
+4. Checking for Missing Values
+python
+Copy
+Edit
+df.isnull().sum()
+Checks if there are any missing (empty) values in each column of the dataset.
+
+5. Creating a Scaler
+python
+Copy
+Edit
+scaler = MinMaxScaler(feature_range=(0, 1))
+Sets up a scaler to convert all values into a range from 0 to 1, which helps the neural network learn better.
+
+Would you like me to continue with the next part of the notebook? 
+
+
+
+
+
+
+
+You said:
+explain full code
+
+
+ChatGPT said:
+It seems like I can’t do more advanced data analysis right now. Please try again later.
+
+If you’d like, you can copy and paste the code from the notebook here, and I’ll explain it line by line for you in simple words. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
